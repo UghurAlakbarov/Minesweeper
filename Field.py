@@ -36,17 +36,9 @@ class Field(tk.Frame):
     def init_value_map(self):
         self.mat_of_values = [[0 for _ in range(self.size)] for _ in range(self.size)]
 
-        for (i, j) in self.set_of_mines:
-            self.increase_value_of_the_neigbouring_cells(i, j)
-
-
-    def increase_value_of_the_neigbouring_cells(self, row, column):
-        for i, j in {
-            (row-1, column-1), (row-1, column  ), (row-1, column+1),
-            (row  , column-1),                    (row  , column+1),
-            (row+1, column-1), (row+1, column  ), (row+1, column+1)
-        }:
-            if all(x in range(self.size) for x in (i, j)):
+        for (row, column) in self.set_of_mines:
+            for neighbours_coords in self.get_valid_neighbours(row, column):
+                i, j = neighbours_coords
                 self.mat_of_values[i][j] += 1
 
 
@@ -62,16 +54,13 @@ class Field(tk.Frame):
 
 
     def open_the_neigbouring_cells(self, row, column):
-        for i, j in {
-            (row-1, column-1), (row-1, column  ), (row-1, column+1),
-            (row  , column-1),                    (row  , column+1),
-            (row+1, column-1), (row+1, column  ), (row+1, column+1)
-        }:
-            if all(x in range(self.size) for x in (i, j)):
-                cell = self.field[i][j]
-                if type(cell) == CellWithoutAMine and not cell.is_opened:
-                    cell.handle_opening()
+        for neighbours_coords in self.get_valid_neighbours(row, column):
+            i, j = neighbours_coords
+            cell = self.field[i][j]
+            if type(cell) == CellWithoutAMine and not cell.is_opened:
+                cell.handle_opening()
     
+
     def blow_everything_up(self, _):
         # show all mines
         for (i, j) in self.set_of_mines:
@@ -83,3 +72,17 @@ class Field(tk.Frame):
             for cell in row:
                 cell.lbl_img.unbind('<Button-1>')
                 cell.lbl_img.unbind('<Button-3>')
+    
+
+    def get_valid_neighbours(self, row : int, column : int) -> list[tuple] :
+        """ Given the coordinates of a cell, get a list of its
+            neighbours that don't go out of the field's boundaries """
+        neighbours = []
+        for x, y in {
+            (row-1, column-1), (row-1, column  ), (row-1, column+1),
+            (row  , column-1),                    (row  , column+1),
+            (row+1, column-1), (row+1, column  ), (row+1, column+1)
+        }:
+            if all(i in range(self.size) for i in (x, y)):
+                neighbours.append((x, y))
+        return neighbours
