@@ -16,6 +16,7 @@ class Field(tk.Frame):
         if mode == 'easy':
             self.size = 8
             self.num_of_mines = 10
+            self.opened_cells_left_for_win = self.size*self.size - self.num_of_mines
 
         # initialize field temporarily filled with InitialCells
         self.field = [[InitialCell(self, row, column) for column in range(self.size)] for row in range(self.size)]
@@ -67,13 +68,8 @@ class Field(tk.Frame):
         # show all mines
         for (i, j) in self.set_of_mines:
             self.field[i][j].handle_opening()
-        # change the sun
-        self.master.upper_menu.sun.show_sun(State.LOST)
-        # make all cells unclickable
-        for row in self.field:
-            for cell in row:
-                cell.lbl_img.unbind('<Button-1>')
-                cell.lbl_img.unbind('<Button-3>')
+        
+        self.finish_game(State.LOST)
     
 
     def get_valid_neighbours(self, row : int, column : int) -> list[tuple] :
@@ -88,3 +84,20 @@ class Field(tk.Frame):
             if all(i in range(self.size) for i in (x, y)):
                 neighbours.append((x, y))
         return neighbours
+
+
+    def check_for_win(self):
+        self.opened_cells_left_for_win -= 1
+        if self.opened_cells_left_for_win == 0:
+            self.finish_game(State.WON)
+
+
+    def finish_game(self, result):
+        # change the sun
+        self.master.upper_menu.sun.show_sun(result)
+
+        # make all cells unclickable
+        for row in self.field:
+            for cell in row:
+                cell.lbl_img.unbind('<Button-1>')
+                cell.lbl_img.unbind('<Button-3>')

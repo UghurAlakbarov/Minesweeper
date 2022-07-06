@@ -20,7 +20,7 @@ class Sun(ttk.Frame):
         self.lbl_sun = None
         self.show_sun(State.START)
 
-    def show_sun(self, state : int):
+    def show_sun(self, state : Enum):
         if self.lbl_sun is not None: self.lbl_sun.pack_forget()
 
         self.lbl_sun = ttk.Label(self, image=self.suns[state.value])

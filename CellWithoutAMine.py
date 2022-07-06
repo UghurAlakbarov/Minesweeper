@@ -20,4 +20,5 @@ class CellWithoutAMine(Cell):
             self.master.open_the_neigbouring_cells(self.row, self.column)
         self.lbl_img.unbind('<Button-1>')
         self.lbl_img.unbind('<Button-3>')
+        self.master.check_for_win()
     
