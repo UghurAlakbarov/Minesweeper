@@ -1,6 +1,7 @@
 import random
 import tkinter as tk
 
+from InitialCell import InitialCell
 from CellWithAMine import CellWithAMine
 from CellWithoutAMine import CellWithoutAMine
 from Sun import State
@@ -16,24 +17,24 @@ class Field(tk.Frame):
             self.size = 8
             self.num_of_mines = 10
 
-        self.init_mines()
-        self.init_value_map()
-        self.init_field()
+        # initialize field temporarily filled with InitialCells
+        self.field = [[InitialCell(self, row, column) for column in range(self.size)] for row in range(self.size)]
+        for row_num, row in enumerate(self.field):
+            for column_num, cell in enumerate(row):
+                cell.grid(row=row_num, column=column_num)
 
 
-    def init_mines(self):
-        """ 
-        Adds bombs by randomly choosing both coordinates.
-        The simplest (and the most stupid) method.
-        """
+    def init_final_field(self, row_num : int, column_num : int):
+        # initialize mines
         self.set_of_mines = set()
         while len(self.set_of_mines) != 10:
             row    = random.randint(0, self.size-1)
             column = random.randint(0, self.size-1)
-            self.set_of_mines.add((row, column)) 
+            if  (row, column) not in self.get_valid_neighbours(row_num, column_num)\
+            and (row, column)               !=                (row_num, column_num):
+                self.set_of_mines.add((row, column)) 
 
-
-    def init_value_map(self):
+        # initialize values
         self.mat_of_values = [[0 for _ in range(self.size)] for _ in range(self.size)]
 
         for (row, column) in self.set_of_mines:
@@ -41,16 +42,17 @@ class Field(tk.Frame):
                 i, j = neighbours_coords
                 self.mat_of_values[i][j] += 1
 
-
-    def init_field(self):
-        self.field = [[None for _ in range(self.size)] for _ in range(self.size)]
-        for row in range(self.size):
-            for column in range(self.size):
+        # initialize the field
+        for row, _ in enumerate(self.field):
+            for column, _ in enumerate(_):
                 if (row, column) in self.set_of_mines:
                     self.field[row][column] = CellWithAMine   (self, row, column)
                 else:
                     self.field[row][column] = CellWithoutAMine(self, row, column, self.mat_of_values[row][column])
                 self.field[row][column].grid(row=row, column=column)
+        
+        # open the clicked cell
+        self.field[row_num][column_num].handle_opening()
 
 
     def open_the_neigbouring_cells(self, row, column):
