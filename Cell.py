@@ -21,13 +21,15 @@ class Cell(ttk.Frame):
         
         self.lbl_img = ttk.Label(self, image=next(self.flagging_images))
         self.lbl_img.focus_set()
+        self.lbl_img.bind('<Button-1>', self.handle_opening)
         self.lbl_img.bind('<Button-3>', self.handle_flagging)
         self.lbl_img.pack()
 
     
+    def handle_opening(self, _=None):
+        self.lbl_img.configure(image=self.img_opened)
+
+
     def handle_flagging(self, _):
         self.lbl_img.configure(image=next(self.flagging_images))
         self.is_flagged = not self.is_flagged
-    
-    def handle_opening(self, _=None):
-        self.lbl_img.configure(image=self.img_opened)

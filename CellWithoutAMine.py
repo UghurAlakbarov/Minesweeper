@@ -8,9 +8,9 @@ class CellWithoutAMine(Cell):
         super().__init__(master, row, column)
 
         self.num_neighbouring_mines = num_neighbouring_mines
+
         self.is_opened = False
         self.img_opened = ImageTk.PhotoImage(Image.open(f'assets/{num_neighbouring_mines}.png').resize((25, 25)))
-        self.lbl_img.bind('<Button-1>', self.handle_opening)
     
 
     def handle_opening(self, _=None):

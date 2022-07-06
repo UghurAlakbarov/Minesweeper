@@ -9,7 +9,3 @@ class CellWithAMine(Cell):
 
         self.img_opened = ImageTk.PhotoImage(Image.open('assets/mine.png').resize((25, 25)))
         self.lbl_img.bind('<Button-1>', self.master.blow_everything_up)
-        
-    
-    def handle_opening(self, _=None):
-        super().handle_opening()
